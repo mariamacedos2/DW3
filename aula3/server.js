@@ -1,4 +1,6 @@
 import Fastify from 'fastify'
+import cors from '@fastify/cors'
+
 
 // Criamos uma instância do servidor Fastify
 const server = Fastify()
@@ -13,25 +15,144 @@ const tarefas = [
     {id: 3, descricao: "Estudar Fastify", concluido: true}
 ]
 
-server.get('/tarefas', async (request, reply) => {
-    return reply.send(tarefas)
+server.get('/tarefas/resumo', async (request, reply) => {
+
+    const total = tarefas.length
+
+    const concluidas = tarefas.filter(t => t.concluido).length
+
+    const pendentes = total - concluidas
+
+    return reply.send({
+        total,
+        concluidas,
+        pendentes
+    })
 })
 
-// C: Criar uma nova tarefa (CREATE)
-server.post('/tarefas', async (request, reply) => {
-    // É no body (corpo) que moram os objetos empacotados pelo front end
-    const tarefa = request.body
+server.get('/tarefas', async (request, reply) => {
+    const { busca, concluido } = request.query
 
-    // Gerando um ID automaticamente no Backend (simulando um Banco de Dados)
-    const novoId = tarefas.length > 0 ? tarefas[tarefas.length - 1].id + 1 : 1
-    const novaTarefa = { id: novoId, ...tarefa }
+    let resultado = tarefas
+
+    if (busca) {
+        resultado = resultado.filter(t =>
+            t.descricao.toLowerCase().includes(busca.toLowerCase())
+        )
+    }
+
+    if (concluido !== undefined) {
+        const concluidoBoolean = concluido === 'true'
+
+        resultado = resultado.filter(t =>
+            t.concluido === concluidoBoolean
+        )
+    }
+
+    return reply.send(resultado)
+})
+
+server.patch('/tarefas/:id', async (request, reply) => {
+    // Extraímos o id de request.params e o convertendo para número, pois os parâmetros de rota são sempre strings.
+    const id = Number(request.params.id)
+
+    // Encontramos o índice da tarefa que corresponde ao ID fornecido. O método .findIndex() retorna o índice do primeiro elemento que satisfaz a condição, ou -1 se nenhum elemento for encontrado.
+    const index = tarefas.findIndex(t => t.id === id)
+
+    // Se o índice for -1, significa que a tarefa não foi encontrada, e respondemos com um status 404 (Not Found) e uma mensagem de erro. O 'return' é crucial para garantir que a função pare de executar após enviar a resposta.
+    if (index === -1) {
+        return reply.status(404).send({ status: 'error', message: 'Tarefa não encontrada' })
+    }
+
+    // O objeto enviado no body da requisição contém as propriedades que queremos atualizar. Ele pode conter apenas um campo ou vários campos, dependendo do que o cliente deseja modificar.
+    const tarefaAtualizada = request.body
+
+    // Aqui usamos o Spread Operator "..." para criar um novo objeto que combina as propriedades antigas da tarefa (tarefas[index]) com as novas propriedades enviadas no body (tarefaAtualizada). O ID é mantido intacto para garantir que a tarefa continue sendo identificada corretamente.
+    tarefas[index] = { ...tarefas[index], ...tarefaAtualizada, id }
+
+    // Retornamos a tarefa atualizada como resposta. O status padrão 200 (OK) é aplicado automaticamente.
+    return reply.send(tarefas[index])
+})
+
+server.patch('/tarefas/:id/concluir', async (request, reply) => {
+    const id = Number(request.params.id)
+
+    const index = tarefas.findIndex(t => t.id === id)
+
+    // ❌ Não encontrou
+    if (index === -1) {
+        return reply.status(404).send({
+            status: 'error',
+            message: 'Tarefa não encontrada'
+        })
+    }
+
+    // 🔄 Inverte o valor
+    tarefas[index].concluido = !tarefas[index].concluido
+
+    // ✅ Retorna a tarefa atualizada
+    return reply.send(tarefas[index])
+})
+
+server.post('/tarefas', async (request, reply) => {
+    const { descricao, concluido } = request.body
+
+    // ❌ VALIDAÇÃO
+    if (!descricao || descricao.trim() === '') {
+        return reply.status(400).send({
+            status: 'error',
+            message: 'A descrição é obrigatória'
+        })
+    }
+
+    const novoId = tarefas.length > 0 
+        ? tarefas[tarefas.length - 1].id + 1 
+        : 1
+
+    const novaTarefa = {
+        id: novoId,
+        descricao,
+        concluido: concluido ?? false
+    }
 
     tarefas.push(novaTarefa)
 
-    // Devolver Status 201 é a prática mundial padrão indicando "Recurso Criado com Sucesso"
     return reply.status(201).send(novaTarefa)
 })
 
+server.delete('/tarefas/:id', async (request, reply) => {
+
+    // Extraímos o ID da tarefa a ser excluída a partir dos parâmetros de rota e o convertemos para número.
+    const id = Number(request.params.id)
+    // Encontramos o índice da tarefa que corresponde ao ID fornecido. O método .findIndex() retorna o índice do primeiro elemento que satisfaz a condição, ou -1 se nenhum elemento for encontrado.
+    const index = tarefas.findIndex(t => t.id === id)
+
+    // Se o índice for -1, significa que a tarefa não foi encontrada, e respondemos com um status 404 (Not Found) e uma mensagem de erro. O 'return' é crucial para garantir que a função pare de executar após enviar a resposta.
+    if (index === -1) {
+        return reply.status(404).send({ status: 'error', message: 'Tarefa não encontrada' })
+    }
+
+    // O método .splice() é utilizado para remover um item do array. Ele recebe dois argumentos: o índice a partir do qual a remoção deve começar e o número de itens a serem removidos (neste caso, 1).
+    tarefas.splice(index, 1)
+
+    // Após a remoção, respondemos com um status 204 (No Content), indicando que a operação foi bem-sucedida, mas não há conteúdo para retornar.
+    return reply.status(204).send()
+})
+
+// Registramos o plugin de CORS para permitir que qualquer origem acesse nossa API
+server.register(cors, {
+    origin: '*',
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS']
+})
+
+server.setNotFoundHandler((request, reply) => {
+
+  return reply.status(404).send({
+    status: 'error',
+    message: 'O recurso solicitado não existe nesta API.',
+  })
+
+})
 
 // Função para iniciar o servidor. Usamos async/await para lidar com a natureza assíncrona do processo de inicialização do servidor.
 const start = async () => {
