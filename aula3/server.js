@@ -79,7 +79,6 @@ server.patch('/tarefas/:id/concluir', async (request, reply) => {
 
     const index = tarefas.findIndex(t => t.id === id)
 
-    // ❌ Não encontrou
     if (index === -1) {
         return reply.status(404).send({
             status: 'error',
@@ -87,17 +86,14 @@ server.patch('/tarefas/:id/concluir', async (request, reply) => {
         })
     }
 
-    // 🔄 Inverte o valor
     tarefas[index].concluido = !tarefas[index].concluido
 
-    // ✅ Retorna a tarefa atualizada
     return reply.send(tarefas[index])
 })
 
 server.post('/tarefas', async (request, reply) => {
     const { descricao, concluido } = request.body
 
-    // ❌ VALIDAÇÃO
     if (!descricao || descricao.trim() === '') {
         return reply.status(400).send({
             status: 'error',
