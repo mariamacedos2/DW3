@@ -5,8 +5,10 @@ import {
   atualizar,
   alternarConcluido,
   remover,
+  listarPendentes,
   obterResumo as obterResumoModel
 } from '../models/tarefa.model.js'
+
 
 // GET /tarefas
 export async function listarTarefas(request, reply) {
@@ -109,4 +111,12 @@ export async function removerTarefa(request, reply) {
   }
 
   return reply.status(204).send()
+}
+
+export async function listarTarefasPendentes(request, reply) {
+  console.log("Controller: listarTarefasPendentes chamado")
+
+  const tarefas = await listarPendentes()
+
+  return reply.send(tarefas)
 }

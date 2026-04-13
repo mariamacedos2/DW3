@@ -5,7 +5,8 @@ import {
   obterTarefa,
   atualizarTarefa,
   concluirTarefa,
-  removerTarefa
+  removerTarefa,
+  listarTarefasPendentes
 } from '../controllers/tarefa.controller.js'
 
 export default async function tarefaRoutes(server, options) {
@@ -44,5 +45,10 @@ export default async function tarefaRoutes(server, options) {
   server.delete('/tarefas/:id', async (request, reply) => {
     console.log("Routes: DELETE /tarefas/:id chamada")
     removerTarefa(request, reply)
+  })
+
+  server.get('/tarefas/pendentes', async (request, reply) => {
+    console.log("Routes: GET /tarefas/pendentes chamada")
+    listarTarefasPendentes(request, reply)
   })
 }
