@@ -1,0 +1,29 @@
+1. Verificar se a descrição não está vazia
+Camada: Controller
+Justificativa:
+O Controller é responsável por validar os dados da requisição antes de enviá-los ao Model. Como a descrição vem do request.body, essa validação deve ser feita no Controller para evitar processamentos desnecessários.
+
+2. Verificar se o ID existe antes de atualizar/remover
+Camada: Model
+Justificativa:
+O Model é responsável pelo acesso aos dados. Portanto, é ele quem deve verificar se o ID existe ao tentar buscar ou manipular uma tarefa.
+
+3. Validar parâmetros de query (concluido)
+Camada: Controller
+Justificativa:
+Os parâmetros de query fazem parte da requisição HTTP, então devem ser validados no Controller antes de serem enviados ao Model.
+
+4. Converter id de string para número
+Camada: Controller
+Justificativa:
+O Controller faz a adaptação dos dados da requisição. Como o id vem da URL como string, a conversão deve ocorrer no Controller antes de enviar ao Model.
+
+5. Impedir deletar tarefa concluída
+Camada: Model
+Justificativa:
+Essa é uma regra de negócio, e regras de negócio pertencem ao Model, que é responsável pela lógica dos dados.
+
+6. Limite de 10 tarefas pendentes
+Camada: Model
+Justificativa:
+Também é uma regra de negócio, pois envolve controle interno dos dados, então deve ser implementada no Model.
