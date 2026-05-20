@@ -1,7 +1,8 @@
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
 
-import tarefaRoutes from './routes/tarefa.routes.js'
+import produtoRoutes from './routes/produto.routes.js'
+import ProdutoController from './controllers/produto.controller.js'
 
 const server = Fastify()
 
@@ -10,7 +11,12 @@ server.register(cors, {
   methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS']
 })
 
-server.register(tarefaRoutes)
+const produtoController = new ProdutoController()
+
+server.register(produtoRoutes, {
+  prefix: '/produtos',
+  controller: produtoController
+})
 
 server.setNotFoundHandler((request, reply) => {
   reply.code(404).send({
