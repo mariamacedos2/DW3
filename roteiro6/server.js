@@ -3,11 +3,11 @@
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
 
-import tarefaRoutes from './src/routes/tarefa.routes.js'
+import tarefaRoutes from './scr/routes/tarefa.routes.js'
 
-import TarefaRepository from './src/repositories/tarefa.repository.js'
-import TarefaService from './src/services/tarefa.service.js'
-import TarefaController from './src/controllers/tarefa.controller.js'
+import TarefaRepository from './scr/repositories/tarefa.repository.js'
+import TarefaService from './scr/services/tarefa.service.js'
+import TarefaController from './scr/controllers/tarefa.controller.js'
 
 const server = Fastify()
 

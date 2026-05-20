@@ -1,0 +1,14 @@
+1. O que é Fat Model?
+Fat Model é quando o Model possui responsabilidades demais, como regras de negócio e acesso aos dados ao mesmo tempo. Isso dificulta manutenção e crescimento da aplicação.
+
+2. Por que usar constructor(repository)?
+O Service recebe o Repository via constructor para reduzir o acoplamento. Assim, é possível trocar o tipo de armazenamento sem alterar as regras de negócio.
+
+3. O que é Composition Root?
+O server.js é o Composition Root porque é o local responsável por criar e conectar todas as dependências da aplicação.
+
+4. Se trocar para PostgreSQL?
+Seria necessário modificar ou criar um novo Repository para acessar o PostgreSQL. O Service e Controller continuariam praticamente iguais, porque a lógica de negócio permanece separada do acesso aos dados.
+
+5. Por que alternarConcluido fica no Service?
+Porque alternar o estado de concluído é uma regra de negócio. O Repository deve apenas buscar, salvar, atualizar e remover dados, sem decidir regras da aplicação.
