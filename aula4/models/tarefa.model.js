@@ -78,9 +78,3 @@ export async function obterResumo() {
 
   return { total, concluidas, pendentes }
 }
-
-export async function listarPendentes() {
-  console.log("Model: listarPendentes chamado")
-
-  return tarefas.filter(t => t.concluido === false)
-}
