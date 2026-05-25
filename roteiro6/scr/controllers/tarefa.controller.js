@@ -4,30 +4,30 @@ class TarefaController {
     this.service = service
   }
 
-  async listarTarefas(request, reply) {
-    console.log("Controller: listarTarefas chamado")
+  async listar(request, reply) {
+  console.log("Controller: listar chamado")
 
-    const { busca, concluido } = request.query
+  const tarefas =
+    await this.service.listar(request.query)
 
-    const resultado = await this.service.listar({
-      busca,
-      concluido
-    })
+  return reply.send(tarefas)
+}
 
-    return reply.send(resultado)
+  async buscar(request, reply) {
+    console.log("Controller: buscar chamado")
+
+    const id = Number(request.params.id)
+
+    const tarefa =
+      await this.service.buscarPorId(id)
+
+    return reply.send(tarefa)
   }
 
   async criarTarefa(request, reply) {
     console.log("Controller: criarTarefa chamado")
 
     const { descricao } = request.body
-
-    if (!descricao || descricao.trim() === '') {
-      return reply.status(400).send({
-        status: 'error',
-        message: 'A descrição da tarefa é obrigatória'
-      })
-    }
 
     const novaTarefa =
       await this.service.criar(descricao)
@@ -43,13 +43,6 @@ class TarefaController {
     const tarefa =
       await this.service.buscarPorId(id)
 
-    if (!tarefa) {
-      return reply.status(404).send({
-        status: 'error',
-        message: 'Tarefa não encontrada'
-      })
-    }
-
     return reply.send(tarefa)
   }
 
@@ -60,13 +53,6 @@ class TarefaController {
 
     const tarefa =
       await this.service.atualizar(id, request.body)
-
-    if (!tarefa) {
-      return reply.status(404).send({
-        status: 'error',
-        message: 'Tarefa não encontrada'
-      })
-    }
 
     return reply.send(tarefa)
   }
@@ -79,30 +65,15 @@ class TarefaController {
     const tarefa =
       await this.service.alternarConcluido(id)
 
-    if (!tarefa) {
-      return reply.status(404).send({
-        status: 'error',
-        message: 'Tarefa não encontrada'
-      })
-    }
-
     return reply.send(tarefa)
   }
 
-  async removerTarefa(request, reply) {
-    console.log("Controller: removerTarefa chamado")
+  async remover(request, reply) {
+    console.log("Controller: remover chamado")
 
     const id = Number(request.params.id)
 
-    const removido =
-      await this.service.remover(id)
-
-    if (!removido) {
-      return reply.status(404).send({
-        status: 'error',
-        message: 'Tarefa não encontrada'
-      })
-    }
+    await this.service.remover(id)
 
     return reply.status(204).send()
   }
@@ -116,7 +87,6 @@ class TarefaController {
     return reply.send(resumo)
   }
 
-  // NOVO ENDPOINT
   async obterPendentes(request, reply) {
     console.log("Controller: obterPendentes chamado")
 

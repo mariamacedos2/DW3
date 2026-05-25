@@ -1,3 +1,5 @@
+import { AppError } from '../errors/AppError.js'
+
 class TarefaService {
 
   constructor(repository) {
@@ -21,6 +23,7 @@ class TarefaService {
     }
 
     if (concluido !== undefined) {
+
       const concluidoBool =
         concluido === 'true'
 
@@ -35,6 +38,29 @@ class TarefaService {
   async criar(descricao) {
     console.log("Service: criar chamado")
 
+    if (!descricao || descricao.trim() === '') {
+      throw new AppError(
+        'A descrição é obrigatória',
+        400
+      )
+    }
+
+    const tarefas =
+      await this.repository.buscarTodos()
+
+    const descricaoJaExiste =
+      tarefas.some(t =>
+        t.descricao.toLowerCase()
+          === descricao.toLowerCase().trim()
+      )
+
+    if (descricaoJaExiste) {
+      throw new AppError(
+        'Já existe uma tarefa com essa descrição',
+        400
+      )
+    }
+
     return this.repository.salvar({
       descricao,
       concluido: false
@@ -44,11 +70,31 @@ class TarefaService {
   async buscarPorId(id) {
     console.log("Service: buscarPorId chamado")
 
-    return this.repository.buscarPorId(id)
+    const tarefa =
+      await this.repository.buscarPorId(id)
+
+    if (!tarefa) {
+      throw new AppError(
+        'Tarefa não encontrada',
+        404
+      )
+    }
+
+    return tarefa
   }
 
   async atualizar(id, dadosAtualizados) {
     console.log("Service: atualizar chamado")
+
+    const tarefa =
+      await this.buscarPorId(id)
+
+    if (tarefa.concluido) {
+      throw new AppError(
+        'Não é possível atualizar uma tarefa concluída',
+        400
+      )
+    }
 
     return this.repository.atualizar(
       id,
@@ -60,11 +106,7 @@ class TarefaService {
     console.log("Service: alternarConcluido chamado")
 
     const tarefa =
-      await this.repository.buscarPorId(id)
-
-    if (!tarefa) {
-      return null
-    }
+      await this.buscarPorId(id)
 
     return this.repository.atualizar(id, {
       concluido: !tarefa.concluido
@@ -73,6 +115,16 @@ class TarefaService {
 
   async remover(id) {
     console.log("Service: remover chamado")
+
+    const tarefa =
+      await this.buscarPorId(id)
+
+    if (tarefa.concluido) {
+      throw new AppError(
+        'Não é possível remover uma tarefa concluída',
+        400
+      )
+    }
 
     return this.repository.remover(id)
   }
@@ -98,7 +150,6 @@ class TarefaService {
     }
   }
 
-  // NOVO
   async listarPendentes() {
     console.log("Service: listarPendentes chamado")
 
