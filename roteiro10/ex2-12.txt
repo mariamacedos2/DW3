@@ -1,0 +1,1 @@
+A configuração max define a quantidade máxima de conexões que o pool pode manter ao mesmo tempo. Já idleTimeoutMillis define por quanto tempo uma conexão sem uso pode permanecer aberta antes de ser encerrada automaticamente.

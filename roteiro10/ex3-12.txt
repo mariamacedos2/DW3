@@ -1,0 +1,9 @@
+Pertencem ao módulo database
+Configuração da conexão com PostgreSQL.
+Criação e gerenciamento do Pool.
+Definição da URL e parâmetros de conexão.
+
+Pertencem ao Repository
+Escrever consultas SQL.
+Buscar dados no banco.
+Inserir, atualizar e remover registros.
