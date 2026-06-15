@@ -20,6 +20,11 @@ async function tarefaRoutes(server) {
     controller.criar
   )
 
+  server.get(
+  '/tarefas/projeto/:projetoId',
+  controller.buscarPorProjeto
+)
+
   server.patch(
     '/tarefas/:id',
     controller.atualizar

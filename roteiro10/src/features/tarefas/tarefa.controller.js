@@ -36,6 +36,14 @@ class TarefaController {
     return reply.send(tarefa)
   }
 
+  buscarPorProjeto = async (request, reply) => {
+  const tarefas = await this.service.buscarPorProjeto(
+    Number(request.params.projetoId)
+  )
+
+  return reply.send(tarefas)
+}
+
   criar = async (request, reply) => {
     const tarefa = await this.service.criar(request.body)
 

@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import Fastify from "fastify";
 import produtoRoutes from "./modules/produtos/produto.routes.js";
 import tarefaRoutes from "./features/tarefas/tarefa.route.js";
