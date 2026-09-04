@@ -1,0 +1,2 @@
+-01 
+O ORM entra depois do SQL puro porque primeiro precisamos entender como o banco funciona e como as consultas SQL são feitas. Depois que já temos essa base, o ORM facilita o trabalho, permitindo fazer essas operações de uma forma mais prática usando o próprio código da aplicação.
